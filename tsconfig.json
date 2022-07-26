@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "meh",
+
+  "compilerOptions": {
+    "allowJs": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "esnext",
+    "module": "CommonJS",
+    "strict" : true,
+    "outDir": "dist",
+    "allowSyntheticDefaultImports": true,
+    "useDefineForClassFields": true,
+    "declaration": true
+  },
+  "include": [ "src" ],
+  "exclude": ["node_modules", "dist" ],
+  "inlineSourceMap": true
+}
