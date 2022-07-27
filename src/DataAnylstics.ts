@@ -3,16 +3,21 @@ Add document to collection DONE
 Add many documents to collection DONE
 
 Query documents by a single / many fields DONE
-Query documents by item in array
+Query documents by item in array DONE
 
-Update a document
+Update a document DONE
 Update an item in an array that is within a document using $push
 */
-"use strict";
+("use strict");
 import { Users, dummies } from "@foxtail-dev/datacontracts";
-import { Db, MongoClient, ObjectId } from "mongodb";
+import { BulkOperationBase, Db, MongoClient, ObjectId } from "mongodb";
 const client = new MongoClient("mongodb://localhost:27017");
 const u: Users.User = dummies.createUser();
+
+const testObject = {
+  color: "blue",
+  things: [1, 2, 3, 4, 5],
+};
 
 const addDocument = async (document: any, category: string) => {
   try {
@@ -46,7 +51,7 @@ const addDocuments = async (
   }
 };
 
-const searcher = async (searchingFor: Array<any>, category: string) => {
+const searchByFields = async (searchingFor: string, category: string) => {
   try {
     await client.connect().then((_) => console.log("Connected to db"));
     const db = client.db(u._id);
@@ -62,6 +67,27 @@ const searcher = async (searchingFor: Array<any>, category: string) => {
   }
 };
 
+const searchByArray = async (
+  searchingBy: any,
+  valueNeeded: any,
+  category: string
+) => {
+  try {
+    await client.connect().then((_) => console.log("Connected to db"));
+    const db = client.db(u._id);
+    const collection = db.collection(category);
+    const cursor = collection.find({
+      searchingBy: { $elemMatch: { valueNeeded } },
+    });
+    if (cursor.toArray.length === 0) {
+      console.warn("No documents were found");
+    } else {
+      await cursor.forEach(console.dir);
+    }
+  } finally {
+    await client.close();
+  }
+};
 const updateDocument = async (
   document: any,
   category: string,
@@ -81,6 +107,24 @@ const updateDocument = async (
     } else {
       console.log(`${(await result).matchedCount} documents were updated.`);
     }
+  } finally {
+    await client.close();
+  }
+};
+
+const updateArrayInDocument = async (
+  category: string,
+  addValue: any,
+  whereToAdd: any
+) => {
+  try {
+    await client.connect().then((_) => console.log("Connected to db"));
+    const db = client.db(u._id);
+    const collection = db.collection(category);
+    const result = collection.updateMany(
+      {},
+      { $push: { whereToAdd: addValue } }
+    );
   } finally {
     await client.close();
   }
